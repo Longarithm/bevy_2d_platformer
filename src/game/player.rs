@@ -160,7 +160,7 @@ fn player_animation(
             AnimationIndices {
                 move_1: 3,
                 move_2: 6 * 7 + 2,
-                jump: 4 * 7 + 3,
+                jump: 6 * 7 + 6,
             }
         } else {
             AnimationIndices {
