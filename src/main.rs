@@ -32,4 +32,6 @@ enum GameState {
 struct GameAssets {
     player_image: Handle<Image>,
     player_layout: Handle<TextureAtlasLayout>,
+    ground_image: Handle<Image>,
+    ground_layout: Handle<TextureAtlasLayout>,
 }

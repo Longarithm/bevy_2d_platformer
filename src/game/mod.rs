@@ -16,6 +16,22 @@ struct Player;
 struct Ground;
 
 fn display_level(mut commands: Commands, assets: Res<GameAssets>) {
+    for i in -3..4 {
+        commands.spawn((
+            // Sprite::from_color(Color::linear_rgb(0.0, 1.0, 0.0), Vec2::new(1000.0, 80.0)),
+            Sprite::from_atlas_image(
+                assets.ground_image.clone(),
+                TextureAtlas {
+                    layout: assets.ground_layout.clone(),
+                    index: 1 * 7 + 0,
+                },
+            ),
+            Transform::from_xyz(i as f32 * 128.0, -190.0, 0.0),
+            Ground,
+            StateScoped(GameState::Game),
+        ));
+    }
+
     commands.spawn((
         Sprite::from_atlas_image(
             assets.player_image.clone(),
@@ -26,12 +42,5 @@ fn display_level(mut commands: Commands, assets: Res<GameAssets>) {
         ),
         StateScoped(GameState::Game),
         Player,
-    ));
-
-    commands.spawn((
-        Sprite::from_color(Color::linear_rgb(0.0, 1.0, 0.0), Vec2::new(1000.0, 80.0)),
-        Transform::from_xyz(0.0, -100.0, 0.0),
-        Ground,
-        StateScoped(GameState::Game),
     ));
 }
