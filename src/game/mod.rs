@@ -21,7 +21,7 @@ pub fn game_plugin(app: &mut App) {
 }
 
 #[derive(Component)]
-#[require(IsOnGround, Velocity, AgainstWall)]
+#[require(IsOnGround, Velocity, AgainstWall, PoweredUp)]
 struct Player;
 
 #[derive(Component, Default)]
@@ -36,6 +36,9 @@ struct Velocity {
     target: f32,
     jumping: f32,
 }
+
+#[derive(Component, Default)]
+struct PoweredUp(bool);
 
 #[derive(Component)]
 struct Ground;
@@ -177,7 +180,7 @@ fn reached_power_up(
     _trigger: Trigger<ReachedPowerUp>,
     mut players: Query<&mut Sprite, With<Player>>,
 ) {
-    for mut player in &mut players {
-        player.texture_atlas.as_mut().unwrap().index = 20;
-    }
+    // for mut player in &mut players {
+    //     player.texture_atlas.as_mut().unwrap().index = 20;
+    // }
 }

@@ -6,7 +6,8 @@ use bevy::{
 use crate::GameState;
 
 use super::{
-    AgainstWall, Flag, Ground, IsOnGround, Player, PowerUp, ReachedFlag, ReachedPowerUp, Velocity,
+    AgainstWall, Flag, Ground, IsOnGround, Player, PowerUp, PoweredUp, ReachedFlag, ReachedPowerUp,
+    Velocity,
 };
 
 pub fn player_plugin(app: &mut App) {
@@ -137,21 +138,40 @@ fn moving(mut player: Query<(&mut Transform, &mut Velocity, &AgainstWall), With<
     }
 }
 
+struct AnimationIndices {
+    move_1: usize,
+    move_2: usize,
+    jump: usize,
+}
+
 fn player_animation(
-    mut player: Query<(&mut Sprite, &Velocity), Changed<Transform>>,
+    mut player: Query<(&mut Sprite, &Velocity, &PoweredUp), Changed<Transform>>,
     mut steps: Local<u32>,
 ) {
-    if let Ok((mut sprite, velocity)) = player.get_single_mut() {
+    if let Ok((mut sprite, velocity, powered_up)) = player.get_single_mut() {
+        let animation_indices = if powered_up.0 {
+            AnimationIndices {
+                move_1: 3,
+                move_2: 6 * 7 + 2,
+                jump: 4 * 7 + 3,
+            }
+        } else {
+            AnimationIndices {
+                move_1: 0,
+                move_2: 7,
+                jump: 35,
+            }
+        };
         if velocity.jumping > 0.0 {
-            sprite.texture_atlas.as_mut().unwrap().index = 35;
+            sprite.texture_atlas.as_mut().unwrap().index = animation_indices.jump;
         } else {
             *steps += 1;
             if *steps % 10 == 0 {
                 sprite.texture_atlas.as_mut().unwrap().index =
-                    if sprite.texture_atlas.as_ref().unwrap().index == 0 {
-                        7
+                    if sprite.texture_atlas.as_ref().unwrap().index == animation_indices.move_1 {
+                        animation_indices.move_2
                     } else {
-                        0
+                        animation_indices.move_1
                     };
             }
         }
@@ -191,16 +211,17 @@ fn near_flag(
 
 fn near_power_up(
     mut commands: Commands,
-    player_transform: Query<&Transform, With<Player>>,
+    mut player_transform: Query<(&Transform, &mut PoweredUp), With<Player>>,
     power_ups: Query<(Entity, &Transform), With<PowerUp>>,
 ) {
-    let player_transform = player_transform.single();
+    let (player_transform, mut powered_up) = player_transform.single_mut();
     for (power_up, power_up_transform) in &power_ups {
         let distance = player_transform
             .translation
             .distance(power_up_transform.translation);
         if distance < 50.0 {
             commands.entity(power_up).trigger(ReachedPowerUp);
+            powered_up.0 = true;
         }
     }
 }
