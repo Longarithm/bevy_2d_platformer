@@ -32,7 +32,7 @@ fn display_title(mut commands: Commands) {
             ));
         });
 
-    commands.insert_resource(SplashScreenTimer(Timer::from_seconds(2.0, TimerMode::Once)));
+    commands.insert_resource(SplashScreenTimer(Timer::from_seconds(0.1, TimerMode::Once)));
 }
 
 #[derive(Resource)]
@@ -78,6 +78,14 @@ fn load_assets(
             UVec2::new(128, 128),
             6,
             4,
+            None,
+            None,
+        )),
+        tiles_image: asset_server.load("spritesheet_tiles.png"),
+        tiles_layout: texture_atlas_layouts.add(TextureAtlasLayout::from_grid(
+            UVec2::new(128, 128),
+            5,
+            16,
             None,
             None,
         )),

@@ -46,6 +46,9 @@ struct Flag;
 #[derive(Event)]
 struct ReachedFlag;
 
+#[derive(Component)]
+struct PowerUp;
+
 fn ground_tile_index(line: &[Tile], i: usize) -> usize {
     match (
         i == 0 || !matches!(line.get(i - 1).unwrap_or(&Tile::Empty), Tile::Ground),
@@ -110,6 +113,22 @@ fn display_tile(
                     Transform::from_xyz(x, y, 1.0).with_scale(Vec3::splat(SCALE)),
                     StateScoped(GameState::Game),
                     Flag,
+                ))
+                .observe(reached_flag);
+        }
+        Tile::PowerUp => {
+            commands
+                .spawn((
+                    Sprite::from_atlas_image(
+                        assets.tiles_image.clone(),
+                        TextureAtlas {
+                            layout: assets.tiles_layout.clone(),
+                            index: 7 * 5 + 2,
+                        },
+                    ),
+                    Transform::from_xyz(x, y, 1.0).with_scale(Vec3::splat(SCALE)),
+                    StateScoped(GameState::Game),
+                    PowerUp,
                 ))
                 .observe(reached_flag);
         }

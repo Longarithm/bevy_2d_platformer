@@ -24,6 +24,7 @@ pub enum Tile {
     Ground,
     Spawn,
     Flag,
+    PowerUp,
 }
 
 #[derive(Default)]
@@ -58,6 +59,7 @@ impl AssetLoader for LevelLoader {
                 '🟩' => line.push(Tile::Ground),
                 '🙂' => line.push(Tile::Spawn),
                 '🏁' => line.push(Tile::Flag),
+                '🍄' => line.push(Tile::PowerUp),
                 '\n' => {
                     tiles.push(line);
                     line = vec![];
