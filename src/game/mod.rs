@@ -15,6 +15,12 @@ struct Player;
 #[derive(Component)]
 struct Ground;
 
+#[derive(Component, Default)]
+struct Velocity {
+    current: f32,
+    target: f32,
+}
+
 fn display_level(mut commands: Commands, assets: Res<GameAssets>) {
     for i in -3..4 {
         commands.spawn((
@@ -43,4 +49,9 @@ fn display_level(mut commands: Commands, assets: Res<GameAssets>) {
         StateScoped(GameState::Game),
         Player,
     ));
+
+    commands.spawn(Velocity {
+        current: 0.0,
+        target: 0.0,
+    });
 }

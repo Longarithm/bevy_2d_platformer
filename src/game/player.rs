@@ -5,13 +5,15 @@ use bevy::{
 
 use crate::GameState;
 
-use super::{Ground, Player};
+use super::{Ground, Player, Velocity};
 
 pub fn player_plugin(app: &mut App) {
     app.add_systems(
         FixedUpdate,
         (
             control_player,
+            velocity_update,
+            transform_update,
             // Uncommend to following line after you've done the exercises 6.4 to have srpites for the ground
             // gravity
         )
@@ -20,19 +22,22 @@ pub fn player_plugin(app: &mut App) {
 }
 fn control_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut player: Query<(&mut Transform, &mut Sprite), With<Player>>,
+    mut player: Query<(&mut Sprite, &mut Velocity), With<Player>>,
     mut steps: Local<u32>,
 ) {
-    let (mut player_transform, mut sprite) = player.single_mut();
+    let (mut sprite, mut velocity) = player.single_mut();
+    velocity.target = 0.0;
     if keyboard_input.pressed(KeyCode::KeyA) {
+        velocity.target = -10.0;
         *steps += 1;
         sprite.flip_x = true;
-        player_transform.translation.x -= 5.0;
+        // player_transform.translation.x -= 5.0;
     }
     if keyboard_input.pressed(KeyCode::KeyD) {
+        velocity.target = 10.0;
         *steps += 1;
         sprite.flip_x = false;
-        player_transform.translation.x += 5.0;
+        // player_transform.translation.x += 5.0;
     }
     if *steps % 10 == 1 {
         *steps %= 10;
@@ -41,6 +46,20 @@ fn control_player(
         } else {
             sprite.texture_atlas.as_mut().unwrap().index = 0 * 7;
         }
+    }
+}
+
+fn velocity_update(mut player: Query<&mut Velocity, With<Player>>) {
+    let mut velocity = player.single_mut();
+    if velocity.target != velocity.current {
+        velocity.current += (velocity.target - velocity.current) / 2.0;
+    }
+}
+
+fn transform_update(mut player: Query<(&mut Transform, &Velocity), With<Player>>) {
+    let (mut transform, velocity) = player.single_mut();
+    if velocity.current != 0.0 {
+        transform.translation.x += velocity.current;
     }
 }
 
