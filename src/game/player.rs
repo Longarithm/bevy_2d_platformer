@@ -5,7 +5,9 @@ use bevy::{
 
 use crate::GameState;
 
-use super::{AgainstWall, Flag, Ground, IsOnGround, Player, ReachedFlag, Velocity};
+use super::{
+    AgainstWall, Flag, Ground, IsOnGround, Player, PowerUp, ReachedFlag, ReachedPowerUp, Velocity,
+};
 
 pub fn player_plugin(app: &mut App) {
     app.add_systems(
@@ -18,6 +20,7 @@ pub fn player_plugin(app: &mut App) {
             death_by_fall,
             gravity.after(on_ground),
             near_flag,
+            near_power_up,
         )
             .run_if(in_state(GameState::Game)),
     );
@@ -182,6 +185,22 @@ fn near_flag(
             .distance(flag_transform.translation);
         if distance < 50.0 {
             commands.entity(flag).trigger(ReachedFlag);
+        }
+    }
+}
+
+fn near_power_up(
+    mut commands: Commands,
+    player_transform: Query<&Transform, With<Player>>,
+    power_ups: Query<(Entity, &Transform), With<PowerUp>>,
+) {
+    let player_transform = player_transform.single();
+    for (power_up, power_up_transform) in &power_ups {
+        let distance = player_transform
+            .translation
+            .distance(power_up_transform.translation);
+        if distance < 50.0 {
+            commands.entity(power_up).trigger(ReachedPowerUp);
         }
     }
 }

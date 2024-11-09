@@ -49,6 +49,9 @@ struct ReachedFlag;
 #[derive(Component)]
 struct PowerUp;
 
+#[derive(Event)]
+struct ReachedPowerUp;
+
 fn ground_tile_index(line: &[Tile], i: usize) -> usize {
     match (
         i == 0 || !matches!(line.get(i - 1).unwrap_or(&Tile::Empty), Tile::Ground),
@@ -130,7 +133,7 @@ fn display_tile(
                     StateScoped(GameState::Game),
                     PowerUp,
                 ))
-                .observe(reached_flag);
+                .observe(reached_power_up);
         }
         Tile::Empty => {}
     }
@@ -168,4 +171,13 @@ fn animate_level(mut flags: Query<&mut Sprite, With<Flag>>) {
 
 fn reached_flag(_trigger: Trigger<ReachedFlag>, mut next: ResMut<NextState<GameState>>) {
     next.set(GameState::Menu);
+}
+
+fn reached_power_up(
+    _trigger: Trigger<ReachedPowerUp>,
+    mut players: Query<&mut Sprite, With<Player>>,
+) {
+    for mut player in &mut players {
+        player.texture_atlas.as_mut().unwrap().index = 20;
+    }
 }
