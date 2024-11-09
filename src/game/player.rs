@@ -113,8 +113,15 @@ fn gravity(mut player: Query<(&mut Transform, &IsOnGround), With<Player>>, time:
     }
 }
 
-fn moving(mut player: Query<(&mut Transform, &mut Velocity, &AgainstWall), With<Player>>) {
-    let (mut player_transform, mut velocity, against_wall) = player.single_mut();
+fn moving(
+    mut player: Query<(&mut Transform, &mut Velocity, &AgainstWall, &PoweredUp), With<Player>>,
+) {
+    let (mut player_transform, mut velocity, against_wall, powered_up) = player.single_mut();
+    let divisor = if powered_up.0 { 1.0 } else { 10.0 };
+    let mut target = velocity.target;
+    if powered_up.0 {
+        target *= 2.0;
+    }
 
     if velocity.jumping > 0.0 {
         player_transform.translation.y += velocity.jumping;
@@ -130,8 +137,8 @@ fn moving(mut player: Query<(&mut Transform, &mut Velocity, &AgainstWall), With<
         }
         player_transform.translation.x += velocity.current;
     }
-    if velocity.current != velocity.target {
-        velocity.current += (velocity.target - velocity.current) / 10.0;
+    if velocity.current != target {
+        velocity.current += (target - velocity.current) / divisor;
         if velocity.current.abs() < 0.1 {
             velocity.current = 0.0;
         }
@@ -221,6 +228,7 @@ fn near_power_up(
             .distance(power_up_transform.translation);
         if distance < 50.0 {
             commands.entity(power_up).trigger(ReachedPowerUp);
+            commands.entity(power_up).despawn();
             powered_up.0 = true;
         }
     }
