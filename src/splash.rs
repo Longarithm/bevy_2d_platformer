@@ -32,7 +32,7 @@ fn display_title(mut commands: Commands) {
             ));
         });
 
-    commands.insert_resource(SplashScreenTimer(Timer::from_seconds(2.0, TimerMode::Once)));
+    commands.insert_resource(SplashScreenTimer(Timer::from_seconds(0.1, TimerMode::Once)));
 }
 
 #[derive(Resource)]

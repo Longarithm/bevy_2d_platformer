@@ -20,14 +20,27 @@ pub fn player_plugin(app: &mut App) {
 }
 fn control_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut player: Query<&mut Transform, With<Player>>,
+    mut player: Query<(&mut Transform, &mut Sprite), With<Player>>,
+    mut steps: Local<u32>,
 ) {
-    let mut player_transform = player.single_mut();
+    let (mut player_transform, mut sprite) = player.single_mut();
     if keyboard_input.pressed(KeyCode::KeyA) {
+        *steps += 1;
+        sprite.flip_x = true;
         player_transform.translation.x -= 5.0;
     }
     if keyboard_input.pressed(KeyCode::KeyD) {
+        *steps += 1;
+        sprite.flip_x = false;
         player_transform.translation.x += 5.0;
+    }
+    if *steps % 10 == 1 {
+        *steps %= 10;
+        if sprite.texture_atlas.as_ref().unwrap().index == 0 {
+            sprite.texture_atlas.as_mut().unwrap().index = 1 * 7;
+        } else {
+            sprite.texture_atlas.as_mut().unwrap().index = 0 * 7;
+        }
     }
 }
 
